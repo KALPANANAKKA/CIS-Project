@@ -15,6 +15,9 @@ const Home = ({username, setUsername, room, setRoom, socket}) => {
     // function called when clicked on JoinRoom button
     const joinRoom = () => {
         // is username and room details are given, person can join the room
+        if(username === ''){ alert('Please enter user name'); }
+        if(room === ''){ alert('Please enter room name'); }
+        
         if(room !== '' && username !== ''){
             // socket emits join_room event
             socket.emit('join_room', {username, room});

@@ -6,6 +6,7 @@ import SendMessage from './send-message';
 import RoomAndUsersColumn from './room-and-users';
 import styles from './styles.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Attachments from './attachments'
 
 
 // design the chat room and users
@@ -26,6 +27,9 @@ const Chat = ({socket, username, room}) => {
                     <div className={styles.send_message}>
                         <SendMessage socket={socket} username={username} room={room} />
                     </div>
+                </div>
+                <div className={styles.attachments}>
+                        <Attachments socket={socket} room={room}/>
                 </div>
             </div>
         </div>

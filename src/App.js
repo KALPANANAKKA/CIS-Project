@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/home';
 import Chat from './pages/chat';
 import Channel from './pages/channel'
+
 import io from 'socket.io-client';
 
 // connect to server on port 4000
@@ -17,8 +18,10 @@ function App() {
   const [username, setUsername] = useState('');
   const [room, setRoom] = useState('');
 
+
   return (
     <Router>
+
       <div className="App">
         {/*
           defining routes to have navigation

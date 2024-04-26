@@ -8,6 +8,8 @@ require('dotenv').config();
 
 const dbSaveMessage = require('./services/db-save-message');
 const dbGetMessages = require('./services/db-get-messages');
+const dbUploadFile = require('./services/db-upload-file');
+const dbGetFiles = require('./services/db-get-files');
 const leaveRoom = require('./utils/leave-room');
 const { emit } = require('process');
 const { all } = require('axios');
@@ -48,6 +50,14 @@ io.on('connection', (socket) => {
       console.log(err);
     });
 
+    // fetch the latest attachments from the database
+    dbGetFiles(room).then((lastFiles) => {
+      console.log(`fetched latest attachments from the database`);
+      socket.emit('getLastFiles', lastFiles);
+    }).catch((err) => {
+      console.log(err);
+    });
+
     let __createdtime__ = Date.now(); // Current timestamp
     // Send message to all users currently in the room, apart from the user that just joined
     socket.to(room).emit('receive_message', {
@@ -79,6 +89,14 @@ io.on('connection', (socket) => {
     io.in(room).emit('receive_message', data); // Send to all users in room, including sender
     dbSaveMessage(message, username, room, __createdtime__) // Save message in db
   });
+
+    // send a message
+    socket.on('upload_file', (data) => {
+      console.log("inside");
+      const { name, blob } = data;
+      io.in(data.room).emit('receive_file', data);
+      dbUploadFile(data) // Save file in db
+    });
 
   // leave the room
   socket.on('leave_room', (data) => {

@@ -5,15 +5,41 @@ import styles from './styles.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Input } from 'reactstrap';
 import { IoSend } from "react-icons/io5";
+import InputEmoji from "react-input-emoji";
+import Files from 'react-files'
+import { RiAttachment2 } from "react-icons/ri";
+
 
 // design send message component
 const SendMessage = ({ socket, username, room }) => {
 
     // store the current message using useState hook
     const [message, setMessage] = useState('');
+    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState([]);
+
+    const handleChange = (uploadedFiles) => {
+        const uploadedFile = uploadedFiles[0];
+        setFile(uploadedFile);
+        console.log(uploadedFile);
+        const __createdtime__ = Date.now();
+        const newFileObj = { 'name': uploadedFile.name, 'blob': URL.createObjectURL(uploadedFile), 'room': room, __createdtime__ };
+        const newFilesList = [...files, newFileObj];
+        setFiles(newFilesList);
+        // socket emits send message event
+        let message = uploadedFile.name + ' is uploaded successfully';
+        socket.emit('send_message', { username, room, message, __createdtime__ });
+        socket.emit('upload_file', newFileObj);
+    }
+
+    const handleError = (error, file) => {
+        console.log('error code ' + error.code + ': ' + error.message)
+    }
+
 
     // function called when send message button is clicked
     const sendMessage = () => {
+        if (message === '') { alert('Please enter a message'); }
         if (message !== ' ') {
             const __createdtime__ = Date.now();
             // socket emits send message event
@@ -23,7 +49,7 @@ const SendMessage = ({ socket, username, room }) => {
     }
 
     const handleEnter = (event) => {
-        if(event.key === 'Enter') {
+        if (event.key === 'Enter') {
             const __createdtime__ = Date.now();
             // socket emits send message event
             socket.emit('send_message', { username, room, message, __createdtime__ });
@@ -35,13 +61,27 @@ const SendMessage = ({ socket, username, room }) => {
     return (
         <div >
             <div className={styles.send_message_inner}>
-                <Input className={styles.inputText}
-                    type='text'
-                    placeholder='type something....'
-                    onChange={(e) => setMessage(e.target.value)}
+                <InputEmoji
+                    className={styles.inputText}
                     value={message}
-                    onKeyDown={handleEnter}
+                    onChange={setMessage}
+                    cleanOnEnter
+                    onEnter={handleEnter}
+                    placeholder="Type a message"
                 />
+                <Files
+
+                    className={styles.fileBtn}
+                    onChange={handleChange}
+                    onError={handleError}
+                    accepts={['image/png', '.pdf', 'audio/*']}
+                    multiple
+                    maxFileSize={10000000}
+                    minFileSize={0}
+                    clickable>
+                    <RiAttachment2 />
+                </Files>
+
                 <Button className={styles.sendBtn} onClick={sendMessage}><IoSend /></Button>
             </div>
         </div>

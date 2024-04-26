@@ -40,10 +40,10 @@ const RoomAndUsers = ({ socket, username, room }) => {
   };
 
   const createChannelLink = () => {
-      const __createdtime__ = Date.now();
-      // socket emits send message event
-      let message = `http://localhost:3000/chat/${room}`;
-      socket.emit('send_message', { username, room, message, __createdtime__ });
+    const __createdtime__ = Date.now();
+    // socket emits send message event
+    let message = `http://localhost:3000/chat/${room}`;
+    socket.emit('send_message', { username, room, message, __createdtime__ });
   }
 
   // this page displays room name, list of available users, leave button
@@ -51,9 +51,8 @@ const RoomAndUsers = ({ socket, username, room }) => {
     <div>
       <h2 className={styles.heading}>{room}</h2>
       <Button className={styles.leaveBtn} onClick={leaveRoom}>
-        Leave
-      </Button>
-
+      {username} can Leave from here
+              </Button>
       <div>
         {roomUsers.length > 0 && <h5 className={styles.userHeading}>Users:</h5>}
         <ul>
